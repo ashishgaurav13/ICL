@@ -10,7 +10,7 @@ setup(
     packages=find_packages(),
     include_package_data=True,
     package_data={
-        'tools': ['assets/driving/*.png', 'assets/highD/*']
+        'tools': ['assets/driving/*.png', 'assets/highD/*', 'assets/exiD/*']
     },
     install_requires=[
         'pytest', 'genbadge', 'coverage', # Testing

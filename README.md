@@ -36,7 +36,7 @@ ExiD dataset.
     * Use saved data: `cp expert-data/data-ENV.pt data.pt`
     * Generate for HighD environment: `python3 -B expert-highD.py`
     * Generate for ExiD environment: `python3 -B expert-exiD.py` (this uses
-    data in `exidtraj`, already provided, which was generated using `prepare_exid_data.py`)
+    data in `tools/assets/exiD`, already provided, which was generated using `prepare_exid_data.py`)
     * Generate for other environments: `python3 -B expert.py -c configs/ENV.json`
 * Run methods
     * ICL: `python3 -B 03-icl-mix-improved.py -c configs/ENV.json -seed SEED -beta BETA`

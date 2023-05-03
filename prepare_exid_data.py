@@ -23,7 +23,7 @@ for num in nums[:5]:
     osm = OSMReader(osmf, utmx, utmy)
     er = ExiDSampleReader(files = {"t": t, "tm": tm, "rm": rm})
     er.read_data(lonlat=True)
-    lane_change_data = load_trajectories2(er, osm, "exidtraj/%s.pt" % num, \
+    lane_change_data = load_trajectories2(er, osm, "tools/assets/exiD/%s.pt" % num, \
         cond1 = lambda x, y: True,
         cond2 = lambda x, y: True)
     # for item in lane_change_data:
