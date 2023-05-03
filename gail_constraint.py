@@ -2,7 +2,6 @@ import os
 import sys
 import torch
 import tools
-import wandb
 import gym
 import numpy as np
 import sys; sys.path += ["baselines"]
@@ -26,14 +25,8 @@ def train(args):
     logdir = "%s(%s)-%s-%s-(%.2f,%d)" % ("GAIL",
         "GC", config_name.split("-")[-1], tools.utils.timestamp(), 
         0, configuration["seed"])
-    logger = tools.data.Logger(project="ICL", 
-        window=configuration["window"], logdir=logdir)
+    logger = tools.data.Logger(window=configuration["window"], logdir=logdir)
     configuration.update({"logger": logger})
-    wandb.run.log_code()
-    # wandb.run.log_code(root=args.c, include_fn=lambda path: path.endswith(".json"))
-    yaml_artifact = wandb.Artifact('config-yaml', type='yaml')
-    yaml_artifact.add_file(args.c)
-    wandb.log_artifact(yaml_artifact)
 
     # Create manual cost function
     if configuration["cost_condition"] != "":

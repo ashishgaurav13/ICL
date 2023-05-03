@@ -4,7 +4,6 @@ import gym
 import numpy as np
 import torch
 import tools
-import wandb
 import sys; sys.path += ["baselines"]
 
 from baselines.common.cns_evaluation import evaluate_icrl_policy
@@ -31,11 +30,6 @@ def train(config):
     logger = tools.data.Logger(project="ICL", 
         window=configuration["window"], logdir=logdir)
     configuration.update({"logger": logger})
-    wandb.run.log_code()
-    # wandb.run.log_code(root=args.c, include_fn=lambda path: path.endswith(".json"))
-    yaml_artifact = wandb.Artifact('config-yaml', type='yaml')
-    yaml_artifact.add_file(args.c)
-    wandb.log_artifact(yaml_artifact)
 
     # Create manual cost function
     if configuration["cost_condition"] != "":

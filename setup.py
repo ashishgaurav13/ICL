@@ -20,7 +20,7 @@ setup(
         'torch==1.11.0', 'numpy', 'pandas', 'scikit-learn', 'POT', 'tensorflow',
             # Neural networks and machine learning
         'gym', 'pyglet', 'Pillow', 'pygame', # Reinforcement learning
-        'tensorboard', 'matplotlib', 'wandb', 'tqdm', 'plotly', 'seaborn', # Plotting & progress
+        'tensorboard', 'matplotlib', 'tqdm', 'plotly', 'seaborn', # Plotting & progress
         'numba', # JIT
         'joblib', 'mpi4py', 'mujoco', 'mujoco_py', # safe_rl package for OpenAI PPO-Lagrange
     ],

@@ -5,7 +5,6 @@ from tools.utils.misc import combine_dicts
 import time
 import os
 from torch.utils.tensorboard import SummaryWriter
-import wandb
 import sys
 
 class Logger:
@@ -13,7 +12,7 @@ class Logger:
     Progress bar based logger.
     """
 
-    def __init__(self, n=None, window=None, logdir=None, project=None,
+    def __init__(self, n=None, window=None, logdir=None,
         config=None, silent=False):
         """
         Progress is just printed to stdout.
@@ -21,6 +20,7 @@ class Logger:
         """
         if logdir != None:
             logdir = os.path.join("runs", logdir)
+        self.logdir = logdir
         self.pbar = None
         self.n = n
         self.pp = pprint.PrettyPrinter(indent=4, stream=sys.stdout)
@@ -32,9 +32,6 @@ class Logger:
         self.start_time = time.time()
         if logdir != None:
             self.writer = SummaryWriter(logdir)
-        if logdir != None and project != None:
-            wandb.init(project=project, name=logdir, config=config)
-            self.wandb = True
     
     def recompute_metrics(self):
         """
@@ -67,8 +64,6 @@ class Logger:
                         self.writer.add_figure(key, to_log[key], self.local_t[key])
                     else:
                         self.writer.add_scalar(key, to_log[key], self.local_t[key])
-                if hasattr(self, 'wandb'):
-                    wandb.log({key: to_log[key], 't': self.local_t[key]}, commit=(i==n-1))
                 self.local_t[key] += 1
             except Exception as e:
                 # print(e)

@@ -11,8 +11,6 @@ import numpy as np
 import pandas
 import torch as th
 
-import wandb
-
 try:
     from torch.utils.tensorboard import SummaryWriter
 except ImportError:
@@ -255,14 +253,6 @@ class TensorBoardOutputFormat(KVWriter):
             self.writer = None
 
 
-class Wandb(KVWriter):
-    def write(self, key_values: Dict[str, Any], key_excluded: Dict[str, Union[str, Tuple[str, ...]]], step: int = 0) -> None:
-        wandb.log({k: v for k, v in key_values.items() if key_excluded[k] is None or "wandb" not in key_excluded[k]}, step=step)
-
-    def close(self) -> None:
-        pass
-
-
 def make_output_format(_format: str, log_dir: str, log_suffix: str = "") -> KVWriter:
     """
     return a logger for the requested format
@@ -283,8 +273,6 @@ def make_output_format(_format: str, log_dir: str, log_suffix: str = "") -> KVWr
         return CSVOutputFormat(os.path.join(log_dir, f"progress{log_suffix}.csv"))
     elif _format == "tensorboard":
         return TensorBoardOutputFormat(log_dir)
-    elif _format == "wandb":
-        return Wandb()         # project name etc. should be set externally
     else:
         raise ValueError(f"Unknown format specified: {_format}")
 
@@ -557,8 +545,7 @@ class Logger(object):
 
 
 # Initialize logger
-Logger.DEFAULT = Logger.CURRENT = Logger(folder=None, output_formats=[HumanOutputFormat(sys.stdout), Wandb()])
-
+Logger.DEFAULT = Logger.CURRENT = Logger(folder=None, output_formats=[HumanOutputFormat(sys.stdout), TensorBoardOutputFormat(folder=None)])
 
 def configure(folder: Optional[str] = None, format_strings: Optional[List[str]] = None) -> None:
     """
