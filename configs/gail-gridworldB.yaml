@@ -1,0 +1,55 @@
+group: GAIL
+verbose: false
+env_type : 'gridworld'
+env_id: 'custom2'
+env: "tools.environments.create('gridworld', 'custom2', normalize_states=False)"
+reward_gamma: 1.0
+discount_factor: 1.0
+learning_rate: 0.0005
+expert_episodes: 50
+window: 25
+normalize_func: "max"
+cost_condition: "lambda s, a: s[0] in [2,3,4] and s[1] in [2,3,4]"
+cost_comparison: "lambda mc, c: __import__('tools').utils.mse(mc, c)"
+accrual_comparison: "lambda ea, a: __import__('tools').utils.wasserstein_distance2d(ea, a)"
+input_format: "lambda s, a: [*s]"
+vector_input_format: "lambda S, A: S"
+state_reduction: "lambda s: s"
+vector_state_reduction: "lambda S: S"
+action_reduction: "lambda a: a"
+vector_action_reduction: "lambda A: A"
+i: 2
+beta: 0.01
+plot_interval: 10
+
+PPO:
+  policy_name: 'MlpPolicy'
+  learning_rate: 0.0005
+  n_steps: 2000
+  n_epochs: 25
+  reward_gamma: 1.0
+  reward_gae_lambda: 1.0
+  clip_range: 0.1
+  ent_coef: 0.01
+  reward_vf_coef: 0.5
+  max_grad_norm: 0.5
+  use_sde: false
+  sde_sample_freq: -1
+  target_kl: null
+  shared_layers: null
+  policy_layers: [64, 64]
+  reward_vf_layers: [64, 64]
+  batch_size: 64
+#  eval_every: 2048
+  timesteps: 2000000
+
+DISC:
+  disc_batch_size: null
+  disc_eps: 1e-05
+  disc_layers: [64, 64]
+  disc_learning_rate: 0.0005
+  disc_normalize": false
+  disc_plot_every: 1
+  clip_obs: 20
+  use_cost_net: true
+  learn_cost: true

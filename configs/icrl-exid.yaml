@@ -1,0 +1,84 @@
+group: ICRL
+verbose: false
+env_type : 'driving'
+env_id: 'exiD'
+env: "tools.environments.create('driving', 'exiD', normalize_states=False, normalize_actions=False, time_limit=1000)"
+test_env: "tools.environments.create('driving', 'exiD', normalize_states=False, normalize_actions=False, time_limit=1000)"
+sampling_env: "tools.environments.create('driving', 'exiD', normalize_states=False, normalize_actions=False, time_limit=1000)"
+reward_gamma: 0.99
+discount_factor: 0.99
+learning_rate: 0.0005
+expert_episodes: 100
+window: 25
+normalize_func: "max"
+cost_condition: ""
+cost_comparison: ""
+accrual_comparison: "lambda ea, a: __import__('tools').utils.mse(ea, a)"
+input_format: "lambda s, a: [s[0]/10., a[0]/5.]"
+vector_input_format: "lambda S, A: torch.cat((S/10., A/5.), dim=-1)"
+state_reduction: "lambda s: s"
+vector_state_reduction: "lambda S: S"
+action_reduction: "lambda a: a"
+vector_action_reduction: "lambda A: A"
+i: 2
+beta: 0.1
+plot_interval: 10
+
+running:
+  sample_rollouts: 50
+  n_eval_episodes: 100
+  n_iters: 250
+
+PPO:
+  policy_name: 'TwoCriticsMlpPolicy'
+  learning_rate: 0.0005
+  n_steps: 1000
+  n_epochs: 80
+  reward_gamma: 0.99
+  reward_gae_lambda: 0.97
+  cost_gamma: 0.99
+  cost_gae_lambda: 0.97
+  clip_range: 0.2
+  ent_coef: 0
+  reward_vf_coef: 0.5
+  cost_vf_coef: 0.5
+  max_grad_norm: 0.5
+  use_sde: False
+  sde_sample_freq: -1
+  target_kl: 0.02
+  shared_layers: null
+  policy_layers: [64, 64]
+  reward_vf_layers: [64, 64]
+  cost_vf_layers: [64, 64]
+  batch_size: 64
+  use_curiosity_driven_exploration: False
+  warmup_timesteps: False
+  reset_policy: False
+  forward_timesteps: 25000
+  clip_range_reward_vf: null
+  clip_range_cost_vf: null
+  penalty_initial_value: 0.1
+  penalty_learning_rate: 0.01
+  budget: 0
+  proportional_control_coeff: 10
+  integral_control_coeff: 0.0001
+  derivative_control_coeff: 0
+  pid_delay: 1
+  proportional_cost_ema_alpha: 0.5
+  derivative_cost_ema_alpha: 0.5
+
+CN:
+  cn_learning_rate: 0.0005
+  cn_reg_coeff: 0.6
+  cn_batch_size: null
+  cn_obs_select_name: null  # null means all
+  cn_acs_select_name: null  # null means all
+  no_importance_sampling: False
+  per_step_importance_sampling: True
+  clip_obs: 20
+  cn_target_kl_old_new: 10
+  cn_target_kl_new_old: 2.5
+  train_gail_lambda: False
+  cn_eps: 0.00001
+  backward_iters: 5
+  anneal_clr_by_factor: 0.9
