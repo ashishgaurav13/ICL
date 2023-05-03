@@ -1,8 +1,7 @@
-from tools.exid import ExiDSampleReader, frame_by_frame
+from tools.exid import ExiDSampleReader
 import pandas
 from tools.exid import OSMReader
-from tools.exid import load_trajectories2, lane_change_start_end2, \
-    find_closest_node, find_segment
+from tools.exid import load_trajectories2
 from shapely.geometry import Point, LineString
 import glob, os, pandas
 
@@ -26,5 +25,3 @@ for num in nums[:5]:
     lane_change_data = load_trajectories2(er, osm, "tools/assets/exiD/%s.pt" % num, \
         cond1 = lambda x, y: True,
         cond2 = lambda x, y: True)
-    # for item in lane_change_data:
-    #     print(item)

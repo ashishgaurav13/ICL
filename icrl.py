@@ -1,18 +1,10 @@
-import datetime
-import importlib
-import json
 import os
-import pickle
 import sys
-import time
-import random
 import gym
 import numpy as np
-import yaml
 import torch
 import tools
 import wandb
-import common
 import sys; sys.path += ["baselines"]
 
 from baselines.common.cns_evaluation import evaluate_icrl_policy
@@ -24,11 +16,6 @@ from baselines.utils.env_utils import sample_from_agent
 from baselines.utils.model_utils import load_ppo_config
 
 tools.utils.nowarnings()
-
-# def null_cost(x, *args):
-#     # Zero cost everywhere
-#     return np.zeros(x.shape[:1])
-
 
 def train(config):
     configuration, seed = load_config(args)
@@ -52,7 +39,7 @@ def train(config):
 
     # Create manual cost function
     if configuration["cost_condition"] != "":
-        manual_cost = common.create_manual_cost_function(configuration)
+        manual_cost = tools.common.create_manual_cost_function(configuration)
         manualcostvalues, manualcostmap = \
             manual_cost.outputs(configuration["state_action_space"])
         manualcostvalues = np.array(manualcostvalues).squeeze()
@@ -294,7 +281,7 @@ def train(config):
         "accrual_comparison_no_cost": configuration["accrual_comparison"](expert_acr, acr),
     })
 
-    common.finish(configuration)
+    tools.common.finish(configuration)
 
 if __name__ == "__main__":
     args = read_args()

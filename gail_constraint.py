@@ -1,19 +1,13 @@
-import datetime
-import json
 import os
 import sys
-import time
 import torch
 import tools
 import wandb
 import gym
-import yaml
 import numpy as np
-import common
 import sys; sys.path += ["baselines"]
 
 from baselines.constraint_models.constraint_net.gail_net import GailDiscriminator, GailCallback
-# from baselines.exploration.exploration import CostShapingCallback
 from baselines.stable_baselines3 import PPO
 from baselines.stable_baselines3.common.utils import get_schedule_fn
 from baselines.utils.data_utils import read_args, load_config
@@ -43,7 +37,7 @@ def train(args):
 
     # Create manual cost function
     if configuration["cost_condition"] != "":
-        manual_cost = common.create_manual_cost_function(configuration)
+        manual_cost = tools.common.create_manual_cost_function(configuration)
         manualcostvalues, manualcostmap = \
             manual_cost.outputs(configuration["state_action_space"])
         manualcostvalues = np.array(manualcostvalues).squeeze()
@@ -190,7 +184,7 @@ def train(args):
         "accrual_comparison_no_cost": configuration["accrual_comparison"](expert_acr, acr),
     })
 
-    common.finish(configuration)
+    tools.common.finish(configuration)
 
 if __name__ == "__main__":
     args = read_args()

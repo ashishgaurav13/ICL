@@ -6,9 +6,151 @@ import numpy as np
 import pygame
 from pygame import gfxdraw
 from gym import spaces, logger
-from gym.utils import seeding
 import random
-import custom_envs
+import os
+from gym.envs.mujoco.ant_v3 import AntEnv
+from gym.envs.mujoco.half_cheetah import HalfCheetahEnv
+
+
+class BrokenJoint(gym.Wrapper):
+    """Wrapper that disables one coordinate of the action, setting it to 0."""
+    def __init__(self, env, broken_joint=None):
+        super(BrokenJoint, self).__init__(env)
+        # Change dtype of observation to be float32.
+        self.observation_space = gym.spaces.Box(
+                low=self.observation_space.low,
+                high=self.observation_space.high,
+                dtype=np.float32,
+        )
+        if broken_joint is not None:
+            assert 0 <= broken_joint <= len(self.action_space.low) - 1
+        self.broken_joint = broken_joint
+
+    def step(self, action):
+        action = action.copy()
+        if self.broken_joint is not None:
+            action[self.broken_joint] = 0
+
+        return super(BrokenJoint, self).step(action)
+
+class AntWall(AntEnv):
+    def __init__(
+            self,
+            healthy_reward=1.0,             # default: 1.0
+            terminate_when_unhealthy=False, # default: True
+            xml_file="assets/mujoco/ant_circle.xml",
+            reset_noise_scale=0.1,
+            exclude_current_positions_from_observation=False
+    ):
+       super(AntWall, self).__init__(
+                xml_file=xml_file,
+                healthy_reward=healthy_reward,
+                terminate_when_unhealthy=terminate_when_unhealthy,
+                reset_noise_scale=reset_noise_scale,
+                exclude_current_positions_from_observation=exclude_current_positions_from_observation
+        )
+    def step(self, action):
+        xy_position_before = self.get_body_com("torso")[:2].copy()
+        self.do_simulation(action, self.frame_skip)
+        xy_position_after = self.get_body_com("torso")[:2].copy()
+
+        xy_velocity = abs(xy_position_after - xy_position_before) / self.dt
+        x_velocity, y_velocity = xy_velocity
+
+        ctrl_cost = self.control_cost(action)
+        contact_cost = self.contact_cost
+
+        forward_reward = x_velocity
+        healthy_reward = self.healthy_reward
+
+#        rewards = forward_reward + healthy_reward
+        distance_from_origin = np.linalg.norm(xy_position_after, ord=2)
+        rewards = distance_from_origin + healthy_reward
+        costs = ctrl_cost + contact_cost
+
+        reward = rewards - costs
+        done = self.terminated
+        observation = self._get_obs()
+        info = {
+            # 'reward_forward': forward_reward,
+            # 'reward_ctrl': -ctrl_cost,
+            # 'reward_contact': -contact_cost,
+            # 'reward_survive': healthy_reward,
+
+            # 'x_position': xy_position_after[0],
+            # 'y_position': xy_position_after[1],
+            # 'distance_from_origin': np.linalg.norm(xy_position_after, ord=2),
+
+            # 'x_velocity': x_velocity,
+            # 'y_velocity': y_velocity,
+            # 'forward_reward': forward_reward,
+        }
+        return observation, reward, done, info
+
+class HalfCheetahWithPos(HalfCheetahEnv):
+    """Also returns the `global' position in HalfCheetah."""
+
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+        self.observation_space = gym.spaces.Box(low=-np.inf, high=np.inf, shape=(18,), dtype=np.float64)
+        self.reward_type = 'old'         # Which reward to use, traditional or new one?
+
+    def _get_obs(self):
+        return np.concatenate([
+            self.sim.data.qpos.flat,
+            self.sim.data.qvel.flat,
+        ])
+
+    def reset_model(self):
+        qpos = self.init_qpos + self.np_random.uniform(low=-.1, high=.1, size=self.model.nq)
+        qvel = self.init_qvel + self.np_random.random(self.model.nv) * .1
+        self.set_state(qpos, qvel)
+        return self._get_obs()
+
+    def old_reward(self, xposbefore, xposafter, action):
+        reward_ctrl = -0.1 * np.square(action).sum()
+        reward_run = abs(xposafter - xposbefore) / self.dt
+        reward = reward_ctrl + reward_run
+
+        info = dict(
+                # reward_run=reward_run,
+                # reward_ctrl=reward_ctrl,
+                # xpos=xposafter
+                )
+
+        return reward, info
+
+    def new_reward(self, xposbefore, xposafter, action):
+        reward_ctrl = -0.1 * np.square(action).sum()
+        reward_dist = abs(xposafter)
+        reward_run  = reward_dist / self.dt
+
+        reward = reward_dist + reward_ctrl
+        info = dict(
+                # reward_run=reward_run,
+                # reward_ctrl=reward_ctrl,
+                # reward_dist=reward_dist,
+                # xpos=xposafter
+                )
+
+        return reward, info
+
+    def step(self, action):
+        xposbefore = self.sim.data.qpos[0]
+        self.do_simulation(action, self.frame_skip)
+        xposafter = self.sim.data.qpos[0]
+        ob = self._get_obs()
+        if self.reward_type == 'new':
+            reward, info = self.new_reward(xposbefore,
+                                           xposafter,
+                                           action)
+        elif self.reward_type == 'old':
+            reward, info = self.old_reward(xposbefore,
+                                           xposafter,
+                                           action)
+        done = False
+        return ob, reward, done, info
+
 
 # Taken from https://github.com/ikostrikov/pytorch-ddpg-naf/blob/master/normalized_actions.py
 class NormalizedActions(Environment):

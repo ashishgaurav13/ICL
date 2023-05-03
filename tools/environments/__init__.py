@@ -1,11 +1,28 @@
 from .gym_environment import GymEnvironment, NormalizedStates, \
-    NormalizedActions, TimeLimit
+    NormalizedActions, TimeLimit, BrokenJoint, HalfCheetahWithPos, \
+    AntWall
 from .driving_environment import DrivingEnvironment
 from .highD_environment import HighDSampleEnvironmentWrapper
 from .gridworld_environment import GridworldEnvironment
 from .exiD_environment import ExiDSampleEnvironmentLateral
 import gym
 import numpy as np
+from gym.envs.registration import register
+
+register(
+    id="HCWithPos-v0",
+    entry_point="tools.environments.half_cheetah:HalfCheetahWithPos",
+    max_episode_steps=1000,
+    reward_threshold=None,
+    nondeterministic=False,
+)
+register(
+    id="AntWall-v0",
+    entry_point="tools.environments.ant:AntWall",
+    max_episode_steps=500,
+    reward_threshold=None,
+    nondeterministic=False,
+)
 
 def create(env_type, env_id, normalize_states=True, normalize_actions=True,
     time_limit=200, **kwargs):

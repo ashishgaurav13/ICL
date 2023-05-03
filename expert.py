@@ -1,18 +1,14 @@
 import tools
-import wandb
-from cppo import CPPO
-from ppolag2 import PPOLag2
-import common
 import gc
 import numpy as np
 tools.utils.nowarnings()
 
 # Get configuration
-configuration = common.get_configuration(method_name="expert")
+configuration = tools.common.get_configuration(method_name="expert")
 
 # Create manual cost function
 assert(configuration["cost_condition"] != "")
-manual_cost = common.create_manual_cost_function(configuration)
+manual_cost = tools.common.create_manual_cost_function(configuration)
 configuration.update({"cost": manual_cost})
 _, manualcostmap = \
     manual_cost.outputs(configuration["state_action_space"])
@@ -22,8 +18,8 @@ configuration["logger"].update({
 
 # Constrained PPO
 algorithm = {
-    "CPPO": CPPO,
-    "PPOLag2": PPOLag2
+    "CPPO": tools.algorithms.CPPO,
+    "PPOLag": tools.algorithms.PPOLag,
 }[configuration["forward_crl"]](configuration)
 for epoch in range(configuration["ppo_epochs"]):
     metrics = algorithm.train(no_mix=True)
@@ -47,4 +43,4 @@ configuration["logger"].update({"expert_accrual": acrplot.fig})
 # Finally
 del configuration.data["cost"]
 gc.collect()
-common.finish(configuration)
+tools.common.finish(configuration)

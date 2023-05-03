@@ -10,16 +10,18 @@ setup(
     packages=find_packages(),
     include_package_data=True,
     package_data={
-        'tools': ['assets/driving/*.png', 'assets/highD/*', 'assets/exiD/*']
+        'tools': ['assets/driving/*.png', 'assets/highD/*', 
+                  'assets/exiD/*', 'assets/mujoco/*']
     },
     install_requires=[
         'pytest', 'genbadge', 'coverage', # Testing
         'pyinterval', 'dill', # Interval objects and pickling
         'pdoc', # Documentation generation
-        'torch==1.11.0', 'numpy', 'pandas', 'scikit-learn', 'POT', 
+        'torch==1.11.0', 'numpy', 'pandas', 'scikit-learn', 'POT', 'tensorflow',
             # Neural networks and machine learning
         'gym', 'pyglet', 'Pillow', 'pygame', # Reinforcement learning
-        'tensorboard', 'matplotlib', 'wandb', 'tqdm', 'plotly', # Plotting & progress
+        'tensorboard', 'matplotlib', 'wandb', 'tqdm', 'plotly', 'seaborn', # Plotting & progress
         'numba', # JIT
+        'joblib', 'mpi4py', 'mujoco', 'mujoco_py', # safe_rl package for OpenAI PPO-Lagrange
     ],
 )

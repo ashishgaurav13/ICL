@@ -1,17 +1,13 @@
-import common
 import tools
 import numpy as np
 import torch
-from cppo import CPPO
-from ppolag2 import PPOLag2
-from costadjustment import CostAdjustment
 
 # Get configuration
-configuration = common.get_configuration(method_name="icl-mix-improved")
+configuration = tools.common.get_configuration(method_name="icl-mix-improved")
 
 # Create manual cost function
 if configuration["cost_condition"] != "":
-    manual_cost = common.create_manual_cost_function(configuration)
+    manual_cost = tools.common.create_manual_cost_function(configuration)
     manualcostvalues, manualcostmap = \
         manual_cost.outputs(configuration["state_action_space"])
     manualcostvalues = np.array(manualcostvalues).squeeze()
@@ -56,8 +52,8 @@ for outer_epoch in range(configuration["outer_epochs"]):
 
     # Constrained PPO
     algorithm = {
-        "CPPO": CPPO,
-        "PPOLag2": PPOLag2,
+        "CPPO": tools.algorithms.CPPO,
+        "PPOLag": tools.algorithms.PPOLag,
     }[configuration["forward_crl"]](configuration)
     for epoch in range(configuration["ppo_epochs"]):
         metrics = algorithm.train()
@@ -78,7 +74,7 @@ for outer_epoch in range(configuration["outer_epochs"]):
     })
 
     # Cost adjustment
-    adjustment = CostAdjustment(configuration)
+    adjustment = tools.algorithms.CostAdjustment(configuration)
     for inner_epoch in range(configuration["updates_per_epoch"]):
         metrics = adjustment.train()
         configuration["logger"].update(metrics)
@@ -91,8 +87,8 @@ for outer_epoch in range(configuration["outer_epochs"]):
 
 # Constrained PPO
 algorithm = {
-    "CPPO": CPPO,
-    "PPOLag2": PPOLag2,
+    "CPPO": tools.algorithms.CPPO,
+    "PPOLag": tools.algorithms.PPOLag,
 }[configuration["forward_crl"]](configuration)
 for epoch in range(configuration["ppo_epochs"]):
     metrics = algorithm.train(no_mix=True)
@@ -130,4 +126,4 @@ configuration["logger"].update({
 })
 
 # Finally
-common.finish(configuration)
+tools.common.finish(configuration)

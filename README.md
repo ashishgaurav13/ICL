@@ -3,11 +3,8 @@ This repository contains the code for ICL paper. After you run any command, the
 results will be logged to Wandb (online) as well as tensorboard (locally).
 
 ## Before running anything
-* Install OpenMPI and `tensorflow,torch==1.11.0,gym==0.25`.
+* Install OpenMPI.
 * Ensure Mujoco libraries (2.1.0) are installed.
-* Install `mujoco,mujoco_py`.
-* Install `custom_envs` package by running `pip install -e .` in the `custom_envs` directory.
-* Install `safe_rl` package by running `pip install -e .` in the `safe_rl` directory.
 * Update lines 410-413 in `tools/environments/exiD_environment.py` to reflect the directory of
 ExiD dataset.
 * Install `tools` package by running `pip install .` in the root directory. 

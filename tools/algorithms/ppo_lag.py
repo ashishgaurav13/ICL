@@ -29,7 +29,7 @@ def save(session, saver, checkpoint_dir):
     dir = os.path.join(checkpoint_dir, "model")
     saver.save(session, dir)
 
-class PPOPolicyWithCost2(Policy):
+class PPOPolicyWithCost(Policy):
 
     def __init__(self, config):
         self.config = config
@@ -102,7 +102,7 @@ class PPOPolicyWithCost2(Policy):
         a = np.reshape(a, [-1])
         return a
 
-class PPOLag2:
+class PPOLag:
     """
     OpenAI PPO Lagrange implementation
     """
@@ -118,7 +118,7 @@ class PPOLag2:
             learn_penalty=True,
             penalty_param_loss=True
         ))
-        self.policy = PPOPolicyWithCost2(config)
+        self.policy = PPOPolicyWithCost(config)
         self.savelogger = EpochLogger()
         self.config["surr_cost_rescale_ph"] = tf.compat.v1.placeholder(tf.float32, shape=())
         self.config["cur_cost_ph"] = tf.compat.v1.placeholder(tf.float32, shape=())

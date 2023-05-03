@@ -17,12 +17,12 @@ from utils.env_utils import CommonRoadExternalSignalsWrapper, MujocoExternalSign
 def make_env(env_id, env_configs, rank, log_dir, group, multi_env=False, seed=0):
     def _init():
         # import env
-        if is_commonroad(env_id):
-            # import commonroad_environment.commonroad_rl.gym_commonroad
-            from commonroad_environment.commonroad_rl import gym_commonroad
-        elif is_mujoco(env_id):
-            # from mujuco_environment.custom_envs.envs import half_cheetah
-            import mujuco_environment.custom_envs
+        # if is_commonroad(env_id):
+        #     # import commonroad_environment.commonroad_rl.gym_commonroad
+        #     from commonroad_environment.commonroad_rl import gym_commonroad
+        # elif is_mujoco(env_id):
+        #     # from mujuco_environment.custom_envs.envs import half_cheetah
+        #     import mujuco_environment.custom_envs
         env_configs_copy = copy(env_configs)
         if multi_env and 'commonroad' in env_id:
             env_configs_copy.update(
