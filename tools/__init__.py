@@ -11,4 +11,9 @@ import tools.safe_rl as safe_rl
 
 import os
 # Package level constants
-store = data.Configuration({})
+store = data.Configuration({
+    "DATA_DIR": os.path.expanduser(
+        "~/Projects/Datasets/exiD/exiD-dataset-v2.0/data/"),
+    "MAPS_DIR": os.path.expanduser(
+        "~/Projects/Datasets/exiD/exiD-dataset-v2.0/maps/lanelet2/"),
+})

@@ -4,11 +4,10 @@ from tools.exid import OSMReader
 from tools.exid import load_trajectories2
 from shapely.geometry import Point, LineString
 import glob, os, pandas
+import tools
 
-DATA_DIR = os.path.expanduser(
-    "~/Projects/Datasets/exiD/exiD-dataset-v2.0/data/")
-MAPS_DIR = os.path.expanduser(
-    "~/Projects/Datasets/exiD/exiD-dataset-v2.0/maps/lanelet2/")
+DATA_DIR = tools.store["DATA_DIR"]
+MAPS_DIR = tools.store["MAPS_DIR"]
 nums = [item.split("/")[-1].split("_")[0] \
     for item in glob.glob(DATA_DIR+"*_tracks.csv")]
 for num in nums[:5]:

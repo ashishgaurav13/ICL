@@ -14,6 +14,7 @@ from .exid_lanelet import OSMReader
 from .exid_sim import load_trajectories, load_trajectories2, lane_change_start_end, \
     find_closest_node, find_segment, find_segment2
 from shapely.geometry import Point, LineString
+import tools
 
 class ExiDSampleEnvironmentLateral(Environment):
 
@@ -169,10 +170,8 @@ class ExiDSampleEnvironmentLateral2(Environment):
     def __init__(self):
         self.dt = 1/25. # from meta file
         self.ers = []
-        DATA_DIR = os.path.expanduser(
-            "~/Projects/Datasets/exiD/exiD-dataset-v2.0/data/")
-        MAPS_DIR = os.path.expanduser(
-            "~/Projects/Datasets/exiD/exiD-dataset-v2.0/maps/lanelet2/")
+        DATA_DIR = tools.store["DATA_DIR"]
+        MAPS_DIR = tools.store["MAPS_DIR"]
         nums = [item.split("/")[-1].split("_")[0] \
             for item in glob.glob(DATA_DIR+"*_tracks.csv")]
         for num in nums[:5]:

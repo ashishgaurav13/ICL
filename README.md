@@ -1,12 +1,34 @@
 ## Inverse Constraint Learning
-This repository contains the code for ICL paper. After you run any command, the
-results will be logged to tensorboard.
 
-## Before running anything
-* Install OpenMPI.
-* Ensure Mujoco libraries (2.1.0) are installed.
-* Update lines 410-413 in `tools/environments/exiD_environment.py` to reflect the directory of
-ExiD dataset.
+Paper: [Learning Soft Constraints From Constrained Expert Demonstrations, Gaurav et al. (2023)](https://openreview.net/forum?id=8sSnD78NqTN)
+
+This repository contains the code for ICL paper. After you run any command, the results will be logged to tensorboard.
+
+## How does it work?
+
+Constrained RL takes in reward and constraint(s) and produces an optimal constrained policy.
+
+<img src="images/crl.png" width=400>
+
+The inverse problem, i.e. Inverse Constrained RL takes in a dataset of trajectories sampled using an optimal expert and produces a set of reward and constraint(s) such that they produce the expert policy when CRL is performed with them.
+
+<img src="images/icrl.png" width=400>
+
+Due to unidentifiability, Inverse Constrained RL is a difficult problem. Hence, we solve a simplified problem - i.e. we assume the reward is known and that we only need to learn a single constraint.
+
+<img src="images/icl.png" width=400>
+
+The idea is inspired from the IRL template, which alternates between policy optimization and reward adjustment. In our case, we alternate between constrained policy optimization and constraint function adjustment.
+
+<img src="images/template.png" width=400>
+
+For further details regarding the optimization and algorithm, please see the [paper](https://openreview.net/forum?id=8sSnD78NqTN).
+
+We conduct several experiments across synthetic environments, robotics environments and real world highway environments. The steps to run these experiments are detailed further in this README.
+
+## Setup
+* Install OpenMPI and Mujoco 2.1.0
+* Update `tools/__init__.py` constants to have the correct directories for ExiD dataset.
 * Install `tools` package by running `pip install .` in the root directory. 
 
 ## High level workflow
@@ -31,9 +53,9 @@ ExiD dataset.
     data in `tools/assets/exiD`, already provided, which was generated using `prepare_exid_data.py`)
     * Generate for other environments: `python3 -B expert.py -c configs/ENV.json`
 * Run methods
-    * ICL: `python3 -B 03-icl-mix-improved.py -c configs/ENV.json -seed SEED -beta BETA`
-    * GAIL-Constraint: `python3 -B 11-gail.py -c configs/gail-ENV.yaml -seed SEED`
-    * ICRL: `python3 -B 12-icrl.py -c configs/icrl-ENV.yaml -seed SEED`
+    * ICL: `python3 -B icl.py -c configs/ENV.json -seed SEED -beta BETA`
+    * GAIL-Constraint: `python3 -B gail_constraint.py -c configs/gail-ENV.yaml -seed SEED`
+    * ICRL: `python3 -B icrl.py -c configs/icrl-ENV.yaml -seed SEED`
 
 ## Credits
 
@@ -50,7 +72,7 @@ Please check the individual repositories for licenses.
 * ExiD dataset
   * https://www.exid-dataset.com/
   * Free for non-commercial use, but to get the dataset, you must request it.
-  * You must place this dataset in (any) directory and update `tools/environments/exiD_environment.py` as
+  * You must place this dataset in (any) directory and update `tools/__init__.py` as
   mentioned previously.
 * Wise-Move environment
   * https://git.uwaterloo.ca/wise-lab/wise-move
