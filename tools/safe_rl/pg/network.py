@@ -1,7 +1,7 @@
 import numpy as np
 import tensorflow as tf
 from gym.spaces import Box, Discrete
-from safe_rl.pg.utils import combined_shape, EPS
+from tools.safe_rl.pg.utils import combined_shape, EPS
 
 
 """

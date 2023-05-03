@@ -5,9 +5,9 @@ import numpy as np
 import tensorflow as tf
 import gym
 import time
-from safe_rl.utils.logx import EpochLogger
-from safe_rl.utils.mpi_tf import sync_all_params, MpiAdamOptimizer
-from safe_rl.utils.mpi_tools import mpi_fork, mpi_sum, proc_id, mpi_statistics_scalar, num_procs
+from tools.safe_rl.utils.logx import EpochLogger
+from tools.safe_rl.utils.mpi_tf import sync_all_params, MpiAdamOptimizer
+from tools.safe_rl.utils.mpi_tools import mpi_fork, mpi_sum, proc_id, mpi_statistics_scalar, num_procs
 
 EPS = 1e-8
 
@@ -590,7 +590,7 @@ if __name__ == '__main__':
 
     mpi_fork(args.cpu)
 
-    from safe_rl.utils.run_utils import setup_logger_kwargs
+    from tools.safe_rl.utils.run_utils import setup_logger_kwargs
     logger_kwargs = setup_logger_kwargs(args.exp_name, args.seed)
 
     sac(lambda : gym.make(args.env), actor_fn=mlp_actor, critic_fn=mlp_critic,

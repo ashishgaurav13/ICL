@@ -1,6 +1,6 @@
 import numpy as np
 import tensorflow as tf
-from safe_rl.pg.utils import EPS
+from tools.safe_rl.pg.utils import EPS
 
 
 """

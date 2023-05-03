@@ -11,14 +11,14 @@ from gym.envs.registration import register
 
 register(
     id="HCWithPos-v0",
-    entry_point="tools.environments.half_cheetah:HalfCheetahWithPos",
+    entry_point="tools.environments.gym_environment:HalfCheetahWithPos",
     max_episode_steps=1000,
     reward_threshold=None,
     nondeterministic=False,
 )
 register(
     id="AntWall-v0",
-    entry_point="tools.environments.ant:AntWall",
+    entry_point="tools.environments.gym_environment:AntWall",
     max_episode_steps=500,
     reward_threshold=None,
     nondeterministic=False,

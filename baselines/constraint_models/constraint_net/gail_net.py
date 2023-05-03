@@ -425,7 +425,8 @@ class GailCallback(callbacks.BaseCallback):
                     configuration["cost_comparison"](manualcostvalues, costvalues)})
 
             dataset = configuration["env"].trajectory_dataset(self.policy, 
-                configuration["expert_episodes"], cost=configuration["cost"])
+                configuration["expert_episodes"], cost=configuration["cost"], 
+                is_torch_policy=configuration["is_torch_policy"])
             acr, acrplot = tools.functions.NormalizedAccrual()({
                 "state_reduction": configuration["state_reduction"],
                 "dataset": dataset,
@@ -439,7 +440,7 @@ class GailCallback(callbacks.BaseCallback):
             })
 
             dataset = configuration["env"].trajectory_dataset(self.policy, 
-                configuration["expert_episodes"])
+                configuration["expert_episodes"], is_torch_policy=configuration["is_torch_policy"])
             configuration.update({"agent_dataset": dataset})
             acr, acrplot = tools.functions.NormalizedAccrual()({
                 "state_reduction": configuration["state_reduction"],

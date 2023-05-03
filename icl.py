@@ -1,13 +1,14 @@
 import tools
 import numpy as np
 import torch
+import os
 
 # Get configuration
-configuration = tools.common.get_configuration(method_name="icl-mix-improved")
+configuration = tools.utils.common.get_configuration(method_name="icl")
 
 # Create manual cost function
 if configuration["cost_condition"] != "":
-    manual_cost = tools.common.create_manual_cost_function(configuration)
+    manual_cost = tools.utils.common.create_manual_cost_function(configuration)
     manualcostvalues, manualcostmap = \
         manual_cost.outputs(configuration["state_action_space"])
     manualcostvalues = np.array(manualcostvalues).squeeze()
@@ -26,7 +27,8 @@ if configuration["cost_condition"] != "":
         configuration["cost_comparison"](manualcostvalues, costvalues)})
 
 # Expert dataset accrual + train flow
-expert_dataset = tools.base.TrajectoryDataset.load()
+expert_dataset = tools.base.TrajectoryDataset.load(filename = \
+    "data.pt" if os.path.exists("data.pt") else "expert-data/data-%s.pt" % configuration["config_name"])
 eS = configuration["vector_state_reduction"](expert_dataset.S)
 eA = configuration["vector_action_reduction"](expert_dataset.A)
 eSA = configuration["vector_input_format"](eS, eA).view(-1, configuration["i"])[
@@ -58,9 +60,14 @@ for outer_epoch in range(configuration["outer_epochs"]):
     for epoch in range(configuration["ppo_epochs"]):
         metrics = algorithm.train()
         configuration["logger"].update(metrics)
+    if "past_pi_weights" not in configuration.data.keys():
+        configuration["past_pi_weights"] = []
+    if "past_pi_dissimilarities" not in configuration.data.keys():
+        configuration["past_pi_dissimilarities"] = []
     dataset = configuration["env"].trajectory_dataset(algorithm.policy, 
         configuration["expert_episodes"], weights=configuration["past_pi_weights"],
-        p=configuration["past_pi_dissimilarities"], config=configuration)
+        p=configuration["past_pi_dissimilarities"], config=configuration,
+        is_torch_policy=configuration["is_torch_policy"])
     acr, acrplot = tools.functions.NormalizedAccrual()({
         "state_reduction": configuration["state_reduction"],
         "dataset": dataset,
@@ -94,7 +101,8 @@ for epoch in range(configuration["ppo_epochs"]):
     metrics = algorithm.train(no_mix=True)
     configuration["logger"].update(metrics)
 dataset = configuration["env"].trajectory_dataset(algorithm.policy, 
-    configuration["expert_episodes"], cost=configuration["cost"], config=configuration)
+    configuration["expert_episodes"], cost=configuration["cost"], config=configuration,
+    is_torch_policy=configuration["is_torch_policy"])
 acr, acrplot = tools.functions.NormalizedAccrual()({
     "state_reduction": configuration["state_reduction"],
     "dataset": dataset,
@@ -111,7 +119,8 @@ configuration["logger"].update({
 
 # Constrained PPO no cost
 dataset = configuration["env"].trajectory_dataset(algorithm.policy, 
-    configuration["expert_episodes"], config=configuration)
+    configuration["expert_episodes"], config=configuration,
+    is_torch_policy=configuration["is_torch_policy"])
 acr, acrplot = tools.functions.NormalizedAccrual()({
     "state_reduction": configuration["state_reduction"],
     "dataset": dataset,
@@ -126,4 +135,4 @@ configuration["logger"].update({
 })
 
 # Finally
-tools.common.finish(configuration)
+tools.utils.common.finish(configuration)

@@ -21,11 +21,16 @@ def get_configuration(method_name=None, config_name=None):
         configuration["env_type"], configuration["env_id"])
     configuration.update({"state_action_space": state_action_space})
     config_name = os.path.splitext(os.path.basename(args.c))[0]
+    configuration.update({"config_name": config_name})
     logdir = "%s(%s)-%s-%s-(%.2f,%d)" % (method_name,
         configuration["forward_crl"], config_name, tools.utils.timestamp(), 
         configuration["beta"], configuration["seed"])
     logger = tools.data.Logger(window=configuration["window"], logdir=logdir)
     configuration.update({"logger": logger})
+    if configuration["forward_crl"] in ["CPPO"]:
+        configuration["is_torch_policy"] = True
+    elif configuration["forward_crl"] in ["PPOLag"]:
+        configuration["is_torch_policy"] = False
     return configuration
 
 def create_manual_cost_function(configuration):

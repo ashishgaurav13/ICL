@@ -4,7 +4,7 @@ import joblib
 import os
 import os.path as osp
 import tensorflow as tf
-from safe_rl.utils.logx import restore_tf_graph
+from tools.safe_rl.utils.logx import restore_tf_graph
 
 def loadmodel(session, saver, checkpoint_dir):
     session.run(tf.compat.v1.global_variables_initializer())

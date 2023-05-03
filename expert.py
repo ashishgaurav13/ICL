@@ -4,11 +4,11 @@ import numpy as np
 tools.utils.nowarnings()
 
 # Get configuration
-configuration = tools.common.get_configuration(method_name="expert")
+configuration = tools.utils.common.get_configuration(method_name="expert")
 
 # Create manual cost function
 assert(configuration["cost_condition"] != "")
-manual_cost = tools.common.create_manual_cost_function(configuration)
+manual_cost = tools.utils.common.create_manual_cost_function(configuration)
 configuration.update({"cost": manual_cost})
 _, manualcostmap = \
     manual_cost.outputs(configuration["state_action_space"])
@@ -27,7 +27,8 @@ for epoch in range(configuration["ppo_epochs"]):
 
 # Finally, save dataset
 dataset = configuration["env"].trajectory_dataset(algorithm.policy, 
-    configuration["expert_episodes"], cost=manual_cost, only_success=True, config=configuration)
+    configuration["expert_episodes"], cost=manual_cost, only_success=True, config=configuration,
+    is_torch_policy=configuration["is_torch_policy"])
 dataset.save()
 acr, acrplot = tools.functions.NormalizedAccrual()({
     "state_reduction": configuration["state_reduction"],
@@ -43,4 +44,4 @@ configuration["logger"].update({"expert_accrual": acrplot.fig})
 # Finally
 del configuration.data["cost"]
 gc.collect()
-tools.common.finish(configuration)
+tools.utils.common.finish(configuration)

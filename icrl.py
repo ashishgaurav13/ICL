@@ -33,7 +33,7 @@ def train(config):
 
     # Create manual cost function
     if configuration["cost_condition"] != "":
-        manual_cost = tools.common.create_manual_cost_function(configuration)
+        manual_cost = tools.utils.common.create_manual_cost_function(configuration)
         manualcostvalues, manualcostmap = \
             manual_cost.outputs(configuration["state_action_space"])
         manualcostvalues = np.array(manualcostvalues).squeeze()
@@ -55,7 +55,8 @@ def train(config):
             configuration["cost_comparison"](manualcostvalues, costvalues)})
 
     # Expert dataset accrual
-    expert_dataset = tools.base.TrajectoryDataset.load()
+    expert_dataset = tools.base.TrajectoryDataset.load(filename = \
+        "data.pt" if os.path.exists("data.pt") else "expert-data/data-%s.pt" % configuration["config_name"])
     expert_acr, expert_acrplot = tools.functions.NormalizedAccrual()({
         "state_reduction": configuration["state_reduction"],
         "dataset": expert_dataset,
@@ -82,7 +83,7 @@ def train(config):
         action_low, action_high = train_env.action_space.low, train_env.action_space.high
 
     # Load expert data
-    expert_data = torch.load("data.pt")
+    expert_data = torch.load("data.pt" if os.path.exists("data.pt") else "expert-data/data-%s.pt" % configuration["config_name"])
     expert_obs = []
     expert_acs = []
     for S, A in expert_data:
@@ -208,7 +209,8 @@ def train(config):
                     configuration["cost_comparison"](manualcostvalues, costvalues)})
 
             dataset = configuration["env"].trajectory_dataset(icrl_policy, 
-                configuration["expert_episodes"], cost=configuration["cost"])
+                configuration["expert_episodes"], cost=configuration["cost"],
+                is_torch_policy=configuration["is_torch_policy"])
             acr, acrplot = tools.functions.NormalizedAccrual()({
                 "state_reduction": configuration["state_reduction"],
                 "dataset": dataset,
@@ -222,7 +224,7 @@ def train(config):
             })
 
             dataset = configuration["env"].trajectory_dataset(icrl_policy, 
-                configuration["expert_episodes"])
+                configuration["expert_episodes"], is_torch_policy=configuration["is_torch_policy"])
             acr, acrplot = tools.functions.NormalizedAccrual()({
                 "state_reduction": configuration["state_reduction"],
                 "dataset": dataset,
@@ -244,7 +246,8 @@ def train(config):
             configuration["cost_comparison"](manualcostvalues, costvalues)})
 
     dataset = configuration["env"].trajectory_dataset(icrl_policy, 
-        configuration["expert_episodes"], cost=configuration["cost"])
+        configuration["expert_episodes"], cost=configuration["cost"],
+        is_torch_policy=configuration["is_torch_policy"])
     acr, acrplot = tools.functions.NormalizedAccrual()({
         "state_reduction": configuration["state_reduction"],
         "dataset": dataset,
@@ -260,7 +263,7 @@ def train(config):
     })
 
     dataset = configuration["env"].trajectory_dataset(icrl_policy, 
-        configuration["expert_episodes"])
+        configuration["expert_episodes"], is_torch_policy=configuration["is_torch_policy"])
     configuration.update({"agent_dataset": dataset})
     acr, acrplot = tools.functions.NormalizedAccrual()({
         "state_reduction": configuration["state_reduction"],
@@ -275,7 +278,7 @@ def train(config):
         "accrual_comparison_no_cost": configuration["accrual_comparison"](expert_acr, acr),
     })
 
-    tools.common.finish(configuration)
+    tools.utils.common.finish(configuration)
 
 if __name__ == "__main__":
     args = read_args()

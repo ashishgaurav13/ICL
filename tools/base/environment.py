@@ -4,7 +4,7 @@ from .dataset import TrajectoryDataset
 import time
 import pickle
 import numpy as np
-from safe_rl.utils.load_utils import load_policy
+from tools.safe_rl.utils.load_utils import load_policy
 
 class Environment(abc.ABC):
     """
@@ -49,8 +49,7 @@ class Environment(abc.ABC):
         pass
 
     def play_episode(self, policy, render=False, buf=None, info=False,
-        sleep=None, frames=False, cost=None, deterministic=False, novelty=None,
-        novelty_add=None, trunc=False):
+        sleep=None, frames=False, cost=None, deterministic=False):
         """
         Play an episode using the given policy.
         If buffer is given, add data to it.
@@ -87,19 +86,11 @@ class Environment(abc.ABC):
                     time.sleep(sleep)
             if cost is not None:
                 Costs += [cost((S[-1], action))]
-            if novelty_add is not None:
-                step_data["reward"] += novelty_add((S[-1], action))
-            if novelty is not None:
-                step_data["reward"] = novelty((S[-1], action))
             S.append(step_data["next_state"])
             R.append(step_data["reward"])
             if "info" in step_data.keys():
                 Info = combine_dicts(Info, step_data["info"])
             done = step_data["done"]
-            if trunc and cost is not None and \
-                rewards_to_returns(Costs, cost.discount_factor)[0] >= cost.beta:
-                done = True
-                Info["max_cost_reached"] = 1.
             if buf != None:
                 buf.add((S[-2], A[-1], R[-1], S[-1], done))
         Info["max_cost_reached"] = 0.
@@ -125,7 +116,7 @@ class Environment(abc.ABC):
         Gc0 = []
         n = 0
         for n in range(N):
-            if weights != None:
+            if weights != None and len(weights) > 0:
                 if p != None and len(p) > 0:
                     p2 = np.array(p)/np.sum(p)
                 else:

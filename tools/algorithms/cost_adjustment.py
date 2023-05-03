@@ -1,7 +1,9 @@
 from tools.base import Algorithm, TrajectoryDataset
 import numpy as np
 import torch
-from safe_rl.utils.load_utils import load_policy
+from tools.safe_rl.utils.load_utils import load_policy
+import os
+import tools
 
 class CostAdjustment(Algorithm):
     """
@@ -14,12 +16,17 @@ class CostAdjustment(Algorithm):
         Initialize CostAdjustment.
         """
         self.config = config
+        if "past_pi_weights" not in config.data.keys():
+            config["past_pi_weights"] = []
+        if "past_pi_dissimilarities" not in config.data.keys():
+            config["past_pi_dissimilarities"] = []
         self.past_pi_weights = config["past_pi_weights"]
-        self.policy = config["policy_class"](config)
+        self.policy = tools.algorithms.PPOPolicy(config)
         self.pi_episodes = config["pi_episodes"]
         self.updates_per_epoch = config["updates_per_epoch"]
         self.alpha = config["alpha"]
-        self.expert_dataset = TrajectoryDataset.load()
+        self.expert_dataset = TrajectoryDataset.load(filename = \
+            "data.pt" if os.path.exists("data.pt") else "expert-data/data-%s.pt" % self.config["config_name"])
         self.D = self.config["t"].f([config["discount_factor"]**i \
             for i in range(self.expert_dataset.max_trajectory_length+10)])        
 

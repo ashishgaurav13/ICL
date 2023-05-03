@@ -1,6 +1,6 @@
 import numpy as np
-from safe_rl.utils.mpi_tools import mpi_statistics_scalar
-from safe_rl.pg.utils import combined_shape, \
+from tools.safe_rl.utils.mpi_tools import mpi_statistics_scalar
+from tools.safe_rl.pg.utils import combined_shape, \
                              keys_as_sorted_list, \
                              values_as_sorted_list, \
                              discount_cumsum, \

@@ -93,7 +93,6 @@ class HalfCheetahWithPos(HalfCheetahEnv):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
         self.observation_space = gym.spaces.Box(low=-np.inf, high=np.inf, shape=(18,), dtype=np.float64)
-        self.reward_type = 'old'         # Which reward to use, traditional or new one?
 
     def _get_obs(self):
         return np.concatenate([
@@ -140,11 +139,12 @@ class HalfCheetahWithPos(HalfCheetahEnv):
         self.do_simulation(action, self.frame_skip)
         xposafter = self.sim.data.qpos[0]
         ob = self._get_obs()
-        if self.reward_type == 'new':
+        reward_type = 'old'         # Which reward to use, traditional or new one?
+        if reward_type == 'new':
             reward, info = self.new_reward(xposbefore,
                                            xposafter,
                                            action)
-        elif self.reward_type == 'old':
+        elif reward_type == 'old':
             reward, info = self.old_reward(xposbefore,
                                            xposafter,
                                            action)

@@ -1,16 +1,16 @@
 from tools.base import Policy
-from safe_rl.pg.network import mlp_actor_critic, placeholders, \
+from tools.safe_rl.pg.network import mlp_actor_critic, placeholders, \
     placeholders_from_spaces, count_vars
-from safe_rl.pg.utils import values_as_sorted_list
+from tools.safe_rl.pg.utils import values_as_sorted_list
 import tensorflow as tf
-from safe_rl.utils.mpi_tf import MpiAdamOptimizer, sync_all_params
-from safe_rl.utils.mpi_tools import mpi_fork, proc_id, num_procs, mpi_sum
-from safe_rl.pg.buffer import CPOBuffer
-from safe_rl.pg.agents import PPOAgent
+from tools.safe_rl.utils.mpi_tf import MpiAdamOptimizer, sync_all_params
+from tools.safe_rl.utils.mpi_tools import mpi_fork, proc_id, num_procs, mpi_sum
+from tools.safe_rl.pg.buffer import CPOBuffer
+from tools.safe_rl.pg.agents import PPOAgent
 import numpy as np
 from tools.utils import combine_dicts
 import gym
-from safe_rl.utils.logx import EpochLogger
+from tools.safe_rl.utils.logx import EpochLogger
 import torch
 import tools, os
 import tqdm
@@ -329,14 +329,18 @@ class PPOLag:
         if not no_mix and \
             "mix_save_epoch" in self.config.data.keys() and \
             self.epoch % self.config["mix_save_epoch"] == 0:
-            fname = "seed%d-itr%d-%s"%(self.config["seed"],self.epoch,tools.utils.timestamp())
+            if not os.path.exists("runs"):
+                os.mkdir("runs")
+            fname = "runs/seed%d-itr%d-%s"%(self.config["seed"],self.epoch,tools.utils.timestamp())
             save(self.config["sess"], self.config["saver"], fname)
+            if "past_pi_weights" not in self.config.data.keys():
+                self.config["past_pi_weights"] = []
             self.config["past_pi_weights"] = self.config["past_pi_weights"] + \
                 [fname] 
             print("Intermediate save at epoch=%d" % self.epoch)
             if "flow" in self.config.data.keys():
                 dataset = self.config["env"].trajectory_dataset(self.policy, 
-                    self.config["expert_episodes"], weights=None)
+                    self.config["expert_episodes"], weights=None, is_torch_policy=self.config["is_torch_policy"])
                 aS = self.config["vector_state_reduction"](dataset.S)
                 aA = self.config["vector_action_reduction"](dataset.A)
                 aSA = self.config["vector_input_format"](aS, aA)
@@ -349,6 +353,8 @@ class PPOLag:
                         self.config["expert_nll"][1]).float().mean()
                     sims += [tpf.item()]
                 am = np.mean(sims)
+                if "past_pi_dissimilarities" not in self.config.data.keys():
+                    self.config["past_pi_dissimilarities"] = []
                 self.config["past_pi_dissimilarities"] = \
                     self.config["past_pi_dissimilarities"] +\
                     [am]

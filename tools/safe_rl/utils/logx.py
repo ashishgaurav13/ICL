@@ -9,8 +9,8 @@ import shutil
 import numpy as np
 import tensorflow as tf
 import os.path as osp, time, atexit, os
-from safe_rl.utils.mpi_tools import proc_id, mpi_statistics_scalar
-from safe_rl.utils.serialization_utils import convert_json
+from tools.safe_rl.utils.mpi_tools import proc_id, mpi_statistics_scalar
+from tools.safe_rl.utils.serialization_utils import convert_json
 
 color2num = dict(
     gray=30,
@@ -72,7 +72,7 @@ class Logger:
     state of a training run, and the trained model.
     """
 
-    def __init__(self, output_dir="./", output_fname='progress.txt', exp_name=None):
+    def __init__(self, output_dir=None, output_fname='progress.txt', exp_name=None):
         """
         Initialize a Logger.
 

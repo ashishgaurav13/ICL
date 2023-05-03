@@ -2,18 +2,18 @@ import numpy as np
 import tensorflow as tf
 import gym
 import time
-import safe_rl.pg.trust_region as tro
-from safe_rl.pg.agents import PPOAgent, TRPOAgent, CPOAgent
-from safe_rl.pg.buffer import CPOBuffer
-from safe_rl.pg.network import count_vars, \
+import tools.safe_rl.pg.trust_region as tro
+from tools.safe_rl.pg.agents import PPOAgent, TRPOAgent, CPOAgent
+from tools.safe_rl.pg.buffer import CPOBuffer
+from tools.safe_rl.pg.network import count_vars, \
                                get_vars, \
                                mlp_actor_critic,\
                                placeholders, \
                                placeholders_from_spaces
-from safe_rl.pg.utils import values_as_sorted_list
-from safe_rl.utils.logx import EpochLogger
-from safe_rl.utils.mpi_tf import MpiAdamOptimizer, sync_all_params
-from safe_rl.utils.mpi_tools import mpi_fork, proc_id, num_procs, mpi_sum
+from tools.safe_rl.pg.utils import values_as_sorted_list
+from tools.safe_rl.utils.logx import EpochLogger
+from tools.safe_rl.utils.mpi_tf import MpiAdamOptimizer, sync_all_params
+from tools.safe_rl.utils.mpi_tools import mpi_fork, proc_id, num_procs, mpi_sum
 
 # Multi-purpose agent runner for policy optimization algos 
 # (PPO, TRPO, their primal-dual equivalents, CPO)
@@ -524,7 +524,7 @@ if __name__ == '__main__':
     mpi_fork(args.cpu)  # run parallel code with mpi
 
     # Prepare logger
-    from safe_rl.utils.run_utils import setup_logger_kwargs
+    from tools.safe_rl.utils.run_utils import setup_logger_kwargs
     logger_kwargs = setup_logger_kwargs(args.exp_name, args.seed)
 
     # Prepare agent

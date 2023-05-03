@@ -39,10 +39,10 @@ ExiD dataset.
 
 Please check the individual repositories for licenses.
 
-* ICRL code and `custom_envs`: 
+* ICRL code: 
   * https://github.com/shehryar-malik/icrl
   * https://github.com/Guiliang/constraint-learning
-* OpenAI safety agents (`safe_rl`):
+* OpenAI safety agents (`tools.safe_rl`):
   * https://github.com/openai/safety-starter-agents
 * HighD dataset
   * https://www.highd-dataset.com
