@@ -1,6 +1,6 @@
 from .gym_environment import GymEnvironment, NormalizedStates, \
     NormalizedActions, TimeLimit, BrokenJoint, HalfCheetahWithPos, \
-    AntWall
+    AntWall, FollowGymAPI
 from .driving_environment import DrivingEnvironment
 from .highD_environment import HighDSampleEnvironmentWrapper
 from .gridworld_environment import GridworldEnvironment

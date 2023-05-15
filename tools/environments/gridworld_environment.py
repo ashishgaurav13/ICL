@@ -158,7 +158,7 @@ class GridworldEnvironment(Environment):
                 random_state = np.random.randint(self.h * self.w)
                 self.curr_state = self.idx2pos(random_state)
         self.terminated = False
-        return self.state
+        return list(self.state)
     
     def step(self, action):
         """

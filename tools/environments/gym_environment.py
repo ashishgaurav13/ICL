@@ -315,6 +315,35 @@ class TimeLimit(Environment):
     def render(self, **kwargs):
         return self.env.render(**kwargs)
 
+class FollowGymAPI(Environment):
+    def __init__(self, env):
+        self.env = env
+        self.observation_space = env.observation_space
+        self.action_space = env.action_space
+
+    def step(self, action):
+        step_data = self.env.step(action)
+        if type(step_data) == dict:
+            observation, reward, done, info = step_data["next_state"], step_data["reward"],\
+                step_data["done"], step_data["info"]
+        else:
+            observation, reward, done, info = step_data
+        return observation, reward, done, info
+
+    def seed(self, s=None):
+        return self.env.seed(s=s)
+
+    @property
+    def state(self):
+        return self.env.state
+
+    def reset(self, **kwargs):
+        self._elapsed_steps = 0
+        return self.env.reset(**kwargs)
+    
+    def render(self, **kwargs):
+        return self.env.render(**kwargs)
+
 """
 github.com/openai/gym/blob/master/gym/envs/classic_control/cartpole.py
 Classic cart-pole system implemented by Rich Sutton et al.
