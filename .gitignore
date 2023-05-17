@@ -4,3 +4,4 @@ build
 *.egg-info
 *__pycache__*
 .ipynb_checkpoints
+expert-data/data-tutorial.pt

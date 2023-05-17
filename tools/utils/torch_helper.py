@@ -107,7 +107,7 @@ class TorchHelper:
                 if l[0] == 'an':
                     fnnl += [FlowAN(l[1])]
                 if l[0] == '1x1conv':
-                    fnnl += [Flow1x1Conv(l[1])]
+                    fnnl += [Flow1x1Conv(l[1], self.device)]
                 if l[0] == 'made':
                     fnnl += [FlowMADE(*l[1:])]
                 if l[0] == 'realnvp':
@@ -461,10 +461,10 @@ class Flow1x1Conv(torch.jit.ScriptModule):
     Invertible 1x1 convolution. (Kingma and Dhariwal, 2018)
     Taken from github.com/tonyduan/normalizing-flows
     """
-    def __init__(self, dim):
+    def __init__(self, dim, device):
         super().__init__()
         self.dim = dim
-        self.device = torch.device("cuda") if torch.cuda.is_available() else torch.device("cpu")
+        self.device = device
         for _ in range(2):
             try:
                 W, _ = torch.linalg.qr(torch.randn(dim, dim).to(self.device))
