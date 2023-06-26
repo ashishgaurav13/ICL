@@ -48,8 +48,8 @@ We conduct several experiments across synthetic environments, robotics environme
         * ExiD: `ENV=exid`
 * Expert data (either generate OR use saved data):
     * Use saved data: `cp expert-data/data-ENV.pt data.pt`
-    * Generate for HighD environment: `python3 -B expert-highD.py`
-    * Generate for ExiD environment: `python3 -B expert-exiD.py` (this uses
+    * Generate for HighD environment: `python3 -B expert_highD.py`
+    * Generate for ExiD environment: `python3 -B expert_exiD.py` (this uses
     data in `tools/assets/exiD`, already provided, which was generated using `prepare_exid_data.py`)
     * Generate for other environments: `python3 -B expert.py -c configs/ENV.json`
 * Run methods
